@@ -4,12 +4,12 @@ from multiagent.scenario import BaseScenario
 
 
 class Scenario(BaseScenario):
-    def make_world(self):
+    def make_world(self, num_ag, num_ad):
         world = World()
         # set any world properties first
         world.dim_c = 2
-        num_agents = 3
-        num_landmarks = 3
+        num_agents = num_ag
+        num_landmarks = num_ag
         world.collaborative = True
         # add agents
         world.agents = [Agent() for i in range(num_agents)]
@@ -52,12 +52,14 @@ class Scenario(BaseScenario):
         for l in world.landmarks:
             dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
             min_dists += min(dists)
+            #min(np.square(min(dists)), np.sqrt(min(dists)))
             rew -= min(dists)
             if min(dists) < 0.1:
                 occupied_landmarks += 1
         if agent.collide:
             for a in world.agents:
                 if self.is_collision(a, agent):
+                    #Comment it out for no collison
                     rew -= 1
                     collisions += 1
         return (rew, collisions, min_dists, occupied_landmarks)
@@ -75,10 +77,13 @@ class Scenario(BaseScenario):
         for l in world.landmarks:
             dists = [np.sqrt(np.sum(np.square(a.state.p_pos - l.state.p_pos))) for a in world.agents]
             rew -= min(dists)
+        #Comment this section out for no collison
+        """
         if agent.collide:
             for a in world.agents:
                 if self.is_collision(a, agent):
                     rew -= 1
+        """
         return rew
 
     def observation(self, agent, world):
